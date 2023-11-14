@@ -1,0 +1,43 @@
+name: 'Deployment'
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - develop
+
+jobs:
+  build_and_deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
+          fetch-depth: 0
+
+      - name: 'Setup Alpine'
+        uses: zacksiri/setup-alpine@master
+        with:
+          branch: v3.18
+          arch: aarch64
+          qemu-repo: edge
+          packages: |
+            zip 
+            tar 
+            sudo 
+            alpine-sdk 
+            coreutils 
+            cmake
+            elixir
+
+      - name: 'Setup PAKman'
+        run: |
+          export MIX_ENV=prod
+
+          mix local.rebar --force
+          mix local.hex --force
+          mix escript.install github upmaru/pakman --force
+        shell: alpine.sh {0}
