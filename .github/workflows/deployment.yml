@@ -34,6 +34,7 @@ jobs:
             elixir
 
       - name: 'Setup PAKman'
+        uses:  mxschmitt/action-tmate@v3
         run: |
           export MIX_ENV=prod
 
@@ -41,3 +42,5 @@ jobs:
           mix local.hex --force
           mix escript.install github upmaru/pakman --force
         shell: alpine.sh {0}
+        with:
+          detached: true
